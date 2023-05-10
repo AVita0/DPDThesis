@@ -33,14 +33,14 @@ tapn = 1;
 Fs = 44.1 * 10^3;                     %For Single and Two-Tone Tests
 % Fs = 20 * 10^6;                         %For 1.0 MHz Bandwidth Tests
 dt = 1/Fs;
-StopTime = .05;
+StopTime = .1;
 t = (0:dt:StopTime-dt)';
 tLen = length(t); 
 
 % noise = randn(size(t));
 % noisefilter = lowpass(noise,1*10^6,Fs, Steepness=.999); %1.0 MHz BW
 % for m = .1 : .1 : 6
-% m = 1;                                  %Mulitplier for 1.0 MHz BW
+% m = .7;                                  %Mulitplier for 1.0 MHz BW
 % s = m * noisefilter; 
 
 f1 = 1000;                            %1.0 KHz
@@ -89,7 +89,7 @@ sPA = (4 * (1./(1+exp( -s))-.5));       %Various PA Models
         sd(n) = s(n)-y(n);
         x(n) = (4 * (1./(1+exp( -sd(n)))-.5));
 
-%         if n < Ts/2+1
+%         if n < Ts/2
 %             x(n) = erf((sqrt(pi)/2)*sd(n));
 %         else
 %             x(n) = tanh((sqrt(pi)/2)*sd(n));
@@ -131,30 +131,30 @@ sPA = (4 * (1./(1+exp( -s))-.5));       %Various PA Models
 %}
 
 % 1 freq input, Figure 5.1-------------------------------------------------
-% figure; 
-% % Orignal Input
-% xTable = timetable(seconds(t),s);
-% [pxx,f] = pspectrum(xTable,Leakage=.9,FrequencyResolution=90);
-% pxx = pow2db(pxx); 
-% plot((f),pxx,'LineWidth', 1, LineStyle= '--' ,Color="#ffc61e");
-% hold on 
-% % Output with DPD
-% xTable = timetable(seconds(t),x);
-% [pxx,f] = pspectrum(xTable,Leakage=.9,FrequencyResolution=90);
-% pxx = pow2db(pxx); 
-% plot(f,pxx,'LineWidth', 1, LineStyle= '-' ,Color="#009ade");
-% hold on
-% % Output With DPD
-% xTable = timetable(seconds(t),sPA);
-% [pxx,f] = pspectrum(xTable,Leakage=.9,FrequencyResolution=90);
-% pxx = pow2db(pxx); 
-% plot(f,pxx,'LineWidth', 1, LineStyle= '-' ,Color="#ff1f5b");
-% hold on 
-% grid on;
-% xlabel('Frequency (Hz)')
-% ylabel('Gain (dB)')
-% legend('Original Input', 'Ouput With DPD', 'Output Without DPD');
-% xlim([500 3500]);
+figure; 
+% Orignal Input
+xTable = timetable(seconds(t),s);
+[pxx,f] = pspectrum(xTable,Leakage=.9,FrequencyResolution=90);
+pxx = pow2db(pxx); 
+plot((f),pxx,'LineWidth', 1, LineStyle= '--' ,Color="#ffc61e");
+hold on 
+% Output with DPD
+xTable = timetable(seconds(t),x);
+[pxx,f] = pspectrum(xTable,Leakage=.9,FrequencyResolution=90);
+pxx = pow2db(pxx); 
+plot(f,pxx,'LineWidth', 1, LineStyle= '-' ,Color="#009ade");
+hold on
+% Output With DPD
+xTable = timetable(seconds(t),sPA);
+[pxx,f] = pspectrum(xTable,Leakage=.9,FrequencyResolution=90);
+pxx = pow2db(pxx); 
+plot(f,pxx,'LineWidth', 1, LineStyle= '-' ,Color="#ff1f5b");
+hold on 
+grid on;
+xlabel('Frequency (Hz)')
+ylabel('Gain (dB)')
+legend('Original Input', 'Ouput With DPD', 'Output Without DPD');
+xlim([500 3500]);
 
 % 1 freq input, AM-AM, Figure 5.2------------------------------------------
 % figure;
@@ -310,49 +310,46 @@ sPA = (4 * (1./(1+exp( -s))-.5));       %Various PA Models
 % grid on 
 
 % 1.0 MHz, Error Power, Figure 5.9-----------------------------------------
-% Set StopTime = .6, m = .5, uncomment th eif else loop in the main code
+% Set StopTime = 1, m = .7, uncomment th eif else loop in the main code
 % run the code for each x(n) in the else loop and save e for all, 
 %name etanh, eatan, ealg. in that order. comment out x(n) before if
-%satement
+% %statement
 % t = tiledlayout(3,1,TileSpacing="tight");
 % 
 % nexttile
 % plot((etanh.^2), LineWidth=1,Color="#009ade"); 
-% ylim([0 0.001])
-% xlim([4*10^6 10*10^6])
+% ylim([0 0.003])
 % grid on 
 % legend('tanh(sd)')
 % 
 % nexttile
 % plot((eatan.^2), LineWidth=1,Color="#af58ba"); 
-% ylim([0 0.002])
-% xlim([4*10^6 10*10^6])
+% ylim([0 0.01])
 % grid on 
 % legend('arctan(sd)')
 % 
 % nexttile
 % plot((ealg.^2), LineWidth=1,Color="#00cd6c"); 
-% ylim([0 0.006])
-% xlim([4*10^6 10*10^6])
+% ylim([0 0.02])
 % grid on 
 % legend('sd/1+|sd|')
 % 
 % xlabel(t, 'Iteration')
 % ylabel(t,'Error Power')
-
-% Averge Error Power, 1.0MHz BW, Figure 5.10-------------------------------
-% run after the previous test, this uses the same naming for e(n)
-% perf = sum((etanh(4*10^6:5*10^6,1)).^2);
-% perf = perf/(1*10^6);
 % 
-% ptanh = sum((etanh(7*10^6:8*10^6,1)).^2);
-% ptanh = ptanh/(1*10^6);
+% % Averge Error Power, 1.0MHz BW, Figure 5.10-------------------------------
+% % run after the previous test, this uses the same naming for e(n)
+% perf = sum((eatan(8*10^6:10*10^6,1).^2));
+% perf = perf/(2*10^6);
 % 
-% patan = sum((eatan(7*10^6:8*10^6,1)).^2);
-% patan = patan/(1*10^6);
+% ptanh = sum((etanh(12*10^6:20*10^6,1).^2));
+% ptanh = ptanh/(6*10^6);
 % 
-% palg = sum((ealg(7*10^6:8*10^6,1)).^2);
-% palg = palg/(1*10^6);
+% patan = sum((eatan(12*10^6:20*10^6,1).^2));
+% patan = patan/(6*10^6);
+% 
+% palg = sum((ealg(12*10^6:20*10^6,1).^2));
+% palg = palg/(6*10^6);
 % 
 % figure; 
 % str = ["erf(sd)" "tanh(sd)" "arctan(sd)" "sd/1+|sd|"];
